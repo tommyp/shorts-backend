@@ -46,7 +46,7 @@ func SetResult(f *forecast.Forecast) Result {
 
 	temp := f.Currently.ApparentTemperature
 
-	if temp >= trigger {
+	if temp >= trigger && contains(goodConditions, f.Currently.Icon) {
 		lines = []string{
 			"Hell yeah",
 			"Of course",
