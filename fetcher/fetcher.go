@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -56,7 +57,9 @@ func SetResult(f *forecast.Forecast) Result {
 			"It bloody well is",
 		}
 
-		description = "It's " + forecastIconToWord(f.Currently.Icon) + " " + string(int(temp)) + " Degrees"
+		t := strconv.Itoa(int(temp))
+
+		description = "It's " + forecastIconToWord(f.Currently.Icon) + " " + t + " Degrees"
 	}
 
 	warmer_hours := []forecast.DataPoint{}
