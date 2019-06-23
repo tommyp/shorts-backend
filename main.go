@@ -1,11 +1,9 @@
 package main
 
 import (
-	"log"
-	"os"
-
 	"github.com/gin-gonic/gin"
-	"github.com/mlbright/forecast/v2"
+
+	"fetcher"
 )
 
 func main() {
@@ -16,12 +14,14 @@ func main() {
 		lat := c.Query("lat")
 		lng := c.Query("lng")
 
-		key := os.Getenv("FORECAST_API_KEY")
+		new := c.Query("new")
 
-		f, err := forecast.Get(key, lat, lng, "now", forecast.UK, forecast.English)
-		if err != nil {
-			log.Println(err)
+		q := fetcher.Query{
+			Latitude:  lat,
+			Longitude: lng,
 		}
+
+		f := fetcher.GetWeather(q)
 
 		c.JSON(200, f)
 	})
