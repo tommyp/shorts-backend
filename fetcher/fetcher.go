@@ -7,20 +7,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/mlbright/forecast/v2"
 )
 
-type query struct {
+type Query struct {
 	Latitude  string
 	Longitude string
 }
 
-type result struct {
+type Result struct {
 	Answer      string
 	Description string
 }
 
-func GetWeather(q query) *forecast.Forecast {
+func GetWeather(q Query) *forecast.Forecast {
+	err := godotenv.Load()
+
 	key := os.Getenv("FORECAST_API_KEY")
 
 	f, err := forecast.Get(key, q.Latitude, q.Longitude, "now", forecast.UK, forecast.English)
@@ -31,7 +34,7 @@ func GetWeather(q query) *forecast.Forecast {
 	return f
 }
 
-func setWeather(f *forecast.Forecast) result {
+func SetResult(f *forecast.Forecast) Result {
 	lines := []string{}
 	var description string
 	trigger := 16.0
@@ -64,7 +67,7 @@ func setWeather(f *forecast.Forecast) result {
 		}
 	}
 
-	return result{
+	return Result{
 		Answer:      random(lines),
 		Description: description,
 	}

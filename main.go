@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"strconv"
 
-	"fetcher"
+	"github.com/gin-gonic/gin"
+	"github.com/tommyp/shorts-backend/fetcher"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 		lat := c.Query("lat")
 		lng := c.Query("lng")
 
-		new := c.Query("new")
+		new, _ := strconv.ParseBool(c.Query("new"))
 
 		q := fetcher.Query{
 			Latitude:  lat,
@@ -23,7 +24,13 @@ func main() {
 
 		f := fetcher.GetWeather(q)
 
-		c.JSON(200, f)
+		if new {
+			r := fetcher.SetResult(f)
+
+			c.JSON(200, r)
+		} else {
+			c.JSON(200, f)
+		}
 	})
 	r.Run()
 }
