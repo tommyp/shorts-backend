@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -46,6 +47,18 @@ func SetResult(f *forecast.Forecast) Result {
 
 	temp := f.Currently.ApparentTemperature
 
+	warmer_hours := []forecast.DataPoint{}
+
+	for _, h := range f.Hourly.Data {
+		if h.ApparentTemperature > trigger && contains(goodConditions, h.Icon) {
+			warmer_hours = append(warmer_hours, h)
+		}
+	}
+
+	warmer_hours = sortHours(warmer_hours)
+
+	t := strconv.Itoa(int(temp))
+
 	if temp >= trigger && contains(goodConditions, f.Currently.Icon) {
 		lines = []string{
 			"Hell yeah",
@@ -57,17 +70,32 @@ func SetResult(f *forecast.Forecast) Result {
 			"It bloody well is",
 		}
 
-		t := strconv.Itoa(int(temp))
-
 		description = "It's " + forecastIconToWord(f.Currently.Icon) + " " + t + " Degrees"
-	}
-
-	warmer_hours := []forecast.DataPoint{}
-
-	for _, h := range f.Hourly.Data {
-		if h.ApparentTemperature > trigger && contains(goodConditions, h.Icon) {
-			warmer_hours = append(warmer_hours, h)
+	} else if len(warmer_hours) >= 1 {
+		// Not warm now but a warmer hour later
+		lines = []string{
+			"Not now, but it'll be warmer later",
+			"Give it a chance",
+			"Houl yer horses",
+			"Relax yer kacks",
+			"Don't worry",
+			"Not yet",
 		}
+
+		description = "It's a " + forecastIconToWord(f.Currently.Icon) + " " + t + " degrees right now, but it'll be " + forecastIconToWord(f.Currently.Icon) + " " + strconv.Itoa(int(warmer_hours[0].ApparentTemperature)) + " degrees later"
+	} else {
+		lines = []string{
+			"No way",
+			"Hell no",
+			"Are you not wise?",
+			"Jeans flat out",
+			"Fraid not",
+			"Way on",
+			"Away on",
+			"Fuck away off",
+			"Are you having a giraffe?",
+		}
+
 	}
 
 	return Result{
@@ -180,4 +208,12 @@ func contains(arr []string, inc string) bool {
 func random(arr []string) string {
 	rand.Seed(time.Now().Unix())
 	return arr[rand.Intn(len(arr))]
+}
+
+func sortHours(hours []forecast.DataPoint) []forecast.DataPoint {
+	sort.SliceStable(hours, func(i, j int) bool {
+		return hours[i].ApparentTemperature > hours[j].ApparentTemperature
+	})
+
+	return hours
 }
