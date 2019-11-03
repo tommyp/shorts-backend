@@ -47,15 +47,15 @@ func SetResult(f *forecast.Forecast) Result {
 
 	temp := f.Currently.ApparentTemperature
 
-	warmer_hours := []forecast.DataPoint{}
+	warmerHours := []forecast.DataPoint{}
 
 	for _, h := range f.Hourly.Data {
 		if h.ApparentTemperature > trigger && contains(goodConditions, h.Icon) {
-			warmer_hours = append(warmer_hours, h)
+			warmerHours = append(warmerHours, h)
 		}
 	}
 
-	warmer_hours = sortHours(warmer_hours)
+	warmerHours = sortHours(warmerHours)
 
 	t := strconv.Itoa(int(temp))
 
@@ -71,7 +71,7 @@ func SetResult(f *forecast.Forecast) Result {
 		}
 
 		description = "It's " + forecastIconToWord(f.Currently.Icon) + " " + t + " Degrees"
-	} else if len(warmer_hours) >= 1 {
+	} else if len(warmerHours) >= 1 {
 		// Not warm now but a warmer hour later
 		lines = []string{
 			"Not now, but it'll be warmer later",
@@ -82,7 +82,7 @@ func SetResult(f *forecast.Forecast) Result {
 			"Not yet",
 		}
 
-		description = "It's a " + forecastIconToWord(f.Currently.Icon) + " " + t + " degrees right now, but it'll be " + forecastIconToWord(f.Currently.Icon) + " " + strconv.Itoa(int(warmer_hours[0].ApparentTemperature)) + " degrees later"
+		description = "It's a " + forecastIconToWord(f.Currently.Icon) + " " + t + " degrees right now, but it'll be " + forecastIconToWord(f.Currently.Icon) + " " + strconv.Itoa(int(warmerHours[0].ApparentTemperature)) + " degrees later"
 	} else {
 		lines = []string{
 			"No way",
@@ -183,16 +183,16 @@ func forecastIconToWord(icon string) string {
 	}
 
 	word := words[icon][rand.Intn(len(words[icon]))]
-	var prefix_word []string
+	var prefixWord []string
 
 	vowels := []string{"a", "e", "i", "o", "u"}
 	if contains(vowels, string(word[0])) {
-		prefix_word = []string{"an", word}
+		prefixWord = []string{"an", word}
 	} else {
-		prefix_word = []string{"a", word}
+		prefixWord = []string{"a", word}
 	}
 
-	return strings.Join(prefix_word, " ")
+	return strings.Join(prefixWord, " ")
 }
 
 func contains(arr []string, inc string) bool {
