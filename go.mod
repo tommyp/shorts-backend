@@ -1,4 +1,4 @@
-module .
+module github.com/tommyp/shorts-backend
 
 go 1.12
 
